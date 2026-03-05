@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+document.querySelector('.add-form').addEventListener('submit', function() {
+    this.querySelector('input[name="todo"]').value = '';
+});
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Todo App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1410;
+            --ink-light: #5c4f42;
+            --paper: #f5f0e8;
+            --paper-dark: #ede5d5;
+            --paper-darker: #e0d5c0;
+            --accent: #c0392b;
+            --accent-warm: #e67e22;
+            --line: rgba(92, 79, 66, 0.15);
+            --shadow: rgba(26, 20, 16, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--paper);
+            background-image:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 27px,
+                    var(--line) 27px,
+                    var(--line) 28px
+                );
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px 20px;
+            color: var(--ink);
+        }
+
+        .notebook {
+            width: 100%;
+            max-width: 560px;
+            background: var(--paper);
+            border-radius: 3px 12px 12px 3px;
+            box-shadow:
+                -4px 0 0 var(--paper-darker),
+                -8px 0 0 var(--paper-dark),
+                0 8px 40px var(--shadow),
+                0 2px 8px var(--shadow);
+            position: relative;
+            padding: 48px 48px 48px 64px;
+            animation: pageIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(20px) rotate(-0.5deg); }
+            to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+        }
+
+        /* Red binding line */
+        .notebook::before {
+            content: '';
+            position: absolute;
+            left: 48px;
+            top: 0;
+            bottom: 0;
+            width: 1.5px;
+            background: rgba(192, 57, 43, 0.35);
+        }
+
+        /* Binding holes */
+        .notebook::after {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 0;
+            bottom: 0;
+            width: 28px;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 70px,
+                var(--paper-darker) 70px,
+                var(--paper-darker) 96px,
+                transparent 96px,
+                transparent 166px
+            );
+        }
+
+        header {
+            margin-bottom: 36px;
+        }
+
+        .label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 36px;
+            font-weight: 600;
+            line-height: 1.1;
+            color: var(--ink);
+            position: relative;
+        }
+
+        h1 span {
+            display: block;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            color: var(--ink-light);
+            margin-top: 4px;
+        }
+
+        /* Add form */
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 36px;
+            align-items: center;
+        }
+
+        .input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrap::before {
+            content: '✦';
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 9px;
+            pointer-events: none;
+        }
+
+        input[type=text] {
+            width: 100%;
+            padding: 11px 12px 11px 28px;
+            border: 1.5px solid var(--paper-darker);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.5);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        input[type=text]::placeholder {
+            color: var(--paper-darker);
+            font-style: italic;
+        }
+
+        input[type=text]:focus {
+            border-color: var(--accent);
+            background: rgba(255,255,255,0.85);
+            box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.08);
+        }
+
+        button[type=submit] {
+            padding: 11px 20px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        button[type=submit]:hover {
+            background: #a93226;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(192, 57, 43, 0.3);
+        }
+
+        button[type=submit]:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .divider span {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--ink-light);
+            white-space: nowrap;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--paper-darker);
+        }
+
+        /* Todo list */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line);
+            font-size: 15px;
+            font-weight: 300;
+            color: var(--ink);
+            animation: itemIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+            transition: color 0.2s;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        li:hover {
+            color: var(--accent);
+        }
+
+        @keyframes itemIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        li:nth-child(1)  { animation-delay: 0.05s; }
+        li:nth-child(2)  { animation-delay: 0.10s; }
+        li:nth-child(3)  { animation-delay: 0.15s; }
+        li:nth-child(4)  { animation-delay: 0.20s; }
+        li:nth-child(5)  { animation-delay: 0.25s; }
+        li:nth-child(6)  { animation-delay: 0.30s; }
+        li:nth-child(7)  { animation-delay: 0.35s; }
+        li:nth-child(8)  { animation-delay: 0.40s; }
+
+        .item-num {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 11px;
+            color: var(--accent);
+            opacity: 0.7;
+            min-width: 20px;
+            text-align: right;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: var(--ink-light);
+        }
+
+        .empty-state .big {
+            font-family: 'Playfair Display', serif;
+            font-size: 48px;
+            opacity: 0.15;
+            line-height: 1;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            font-style: italic;
+            opacity: 0.6;
+        }
+
+        footer {
+            margin-top: 36px;
+            padding-top: 16px;
+            border-top: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        footer span {
+            font-size: 11px;
+            color: var(--ink-light);
+            opacity: 0.6;
+        }
+
+        .count-badge {
+            background: var(--paper-darker);
+            color: var(--ink-light);
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+    <div class="notebook">
+        <header>
+            <span class="label">My List</span>
+            <h1>
+                Today's Tasks
+                <span>Stay focused, one task at a time.</span>
+            </h1>
+        </header>
+
+       <form class="add-form" action="/add" method="post" onsubmit="this.querySelector('button').disabled=true;">
+    <div class="input-wrap">
+        <input type="text" name="todo" placeholder="Write something to do…" required>
+    </div>
+    <button type="submit">Add</button>
+</form>
+
+        <div class="divider">
+            <div class="divider-line"></div>
+            <span>Tasks</span>
+            <div class="divider-line"></div>
+        </div>
+
+        <ul>
+            <ul>
+    {% for item in todos %}
+        <li>
+            <span class="item-num">{{ loop.index }}.</span>
+            {{ item }}
+            <!-- Delete button -->
+            <form action="/remove" method="post" style="display:inline;">
+                <input type="hidden" name="index" value="{{ loop.index0 }}">
+                <button type="submit" style="margin-left: 10px; padding: 2px 6px; font-size: 12px; background:#e74c3c; color:white; border:none; border-radius:4px; cursor:pointer;">Delete</button>
+            </form>
+        </li>
+    {% endfor %}
+</ul>
+            {% for item in todos %}
+                <li>
+                    <span class="item-num">{{ loop.index }}.</span>
+                    {{ item }}
+                </li>
+            {% endfor %}
+            
+        </ul>
+
+        {% if not todos %}
+        <div class="empty-state">
+            <div class="big">✦</div>
+            <p>Your list is empty — add something above.</p>
+        </div>
+        {% endif %}
+
+        <footer>
+            <span>FastAPI · Jinja2</span>
+            <span class="count-badge">{{ todos|length }} item{% if todos|length != 1 %}s{% endif %}</span>
+        </footer>
+    </div>
+    
+</body>
+</html>
